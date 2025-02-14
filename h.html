@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thư tình cho người yêu</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: linear-gradient(45deg, #ff9a9e, #fad0c4, #ffecd2);
+        font-family: Arial, sans-serif;
+        overflow: hidden;
+      }
+
+      #envelope {
+        width: 300px;
+        height: 200px;
+        background-color: #f5e5d5;
+        position: relative;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+      }
+
+      #envelope:hover {
+        transform: scale(1.05);
+      }
+
+      #envelope::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 0;
+        border-left: 150px solid transparent;
+        border-right: 150px solid transparent;
+        border-top: 100px solid #e6d0b8;
+        transform-origin: top;
+        transition: transform 0.5s ease;
+      }
+
+      #envelope.open::before {
+        transform: rotateX(180deg);
+      }
+
+      #letter {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        background-color: white;
+        padding: 20px;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(100%);
+        transition: transform 0.5s ease, opacity 0.5s ease;
+        overflow: auto;
+      }
+
+      /* Scrollbar đẹp hơn */
+      #letter::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      #letter::-webkit-scrollbar-track {
+        background: #ffd6e0;
+        border-radius: 10px;
+      }
+
+      #letter::-webkit-scrollbar-thumb {
+        background: linear-gradient(45deg, #ff4d6d, #ff758f);
+        border-radius: 10px;
+      }
+
+      #letter::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(45deg, #ff2e63, #ff5c83);
+      }
+
+      #envelope.open #letter {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      /* Ánh sáng lấp lánh quanh phong bì */
+      @keyframes sparkle {
+        0% {
+          box-shadow: 0 0 5px rgba(255, 107, 107, 0.8);
+        }
+        50% {
+          box-shadow: 0 0 15px rgba(255, 50, 50, 1);
+        }
+        100% {
+          box-shadow: 0 0 5px rgba(255, 107, 107, 0.8);
+        }
+      }
+
+      #envelope:hover {
+        animation: sparkle 1.5s infinite;
+      }
+
+      h1 {
+        color: #ff6b6b;
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+
+      p {
+        font-size: 16px;
+        line-height: 1.5;
+        margin-bottom: 10px;
+      }
+
+      /* Hiệu ứng chữ phát sáng */
+      .glowing-text {
+        position: absolute;
+        top: 20%;
+        font-size: 20px;
+        color: #ff4d6d;
+        font-weight: bold;
+        text-align: center;
+        animation: glow 2s infinite alternate;
+      }
+
+      @keyframes glow {
+        from {
+          text-shadow: 0 0 5px #ff9a9e, 0 0 10px #ff758f;
+        }
+        to {
+          text-shadow: 0 0 15px #ff2e63, 0 0 30px #ff4d6d;
+        }
+      }
+
+      /* Hiệu ứng trái tim rơi */
+      .heart-falling {
+        position: fixed;
+        top: -10px;
+        width: 20px;
+        height: 20px;
+        background-color: #ff4d6d;
+        transform: rotate(45deg);
+        opacity: 0.8;
+        animation: fall linear infinite;
+      }
+
+      .heart-falling::before,
+      .heart-falling::after {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background-color: #ff4d6d;
+        border-radius: 50%;
+      }
+
+      .heart-falling::before {
+        left: -10px;
+      }
+
+      .heart-falling::after {
+        top: -10px;
+      }
+
+      @keyframes fall {
+        0% {
+          transform: translateY(0) rotate(45deg);
+        }
+        100% {
+          transform: translateY(100vh) rotate(45deg);
+          opacity: 0;
+        }
+      }
+
+      #music-btn {
+        position: absolute;
+        top: 20%;
+        background: linear-gradient(45deg, #ff9a9e, #fad0c4, #ffecd2);
+        border: none;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <p class="glowing-text">I Love You ❤️</p>
+
+    <button id="music-btn">🎵 Play Music</button>
+    <audio id="bg-music" loop>
+      <source src="love-song.mp4" type="audio/mpeg" />
+    </audio>
+
+    <div id="envelope">
+      <div id="letter">
+        <h1>Gửi người yêu của anh</h1>
+        <p id="typing-text"></p>
+        <p>Anh yêu em nhiều lắm!</p>
+      </div>
+    </div>
+
+    <script>
+      const envelope = document.getElementById("envelope");
+      const letter = document.getElementById("letter");
+
+      envelope.addEventListener("click", () => {
+        envelope.classList.toggle("open");
+        if (envelope.classList.contains("open")) {
+          startTypingEffect();
+        }
+      });
+
+      function createFallingHeart() {
+        const heart = document.createElement("div");
+        heart.classList.add("heart-falling");
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.animationDuration = Math.random() * 2 + 3 + "s";
+        document.body.appendChild(heart);
+
+        setTimeout(() => {
+          heart.remove();
+        }, 5000);
+      }
+
+      setInterval(createFallingHeart, 300);
+
+      function startTypingEffect() {
+        const textElement = document.getElementById("typing-text");
+        const text =
+          "Em là ánh sáng trong cuộc đời anh, là nguồn cảm hứng cho mọi khoảnh khắc.";
+        let charIndex = 0;
+
+        function type() {
+          if (charIndex < text.length) {
+            textElement.textContent += text.charAt(charIndex);
+            charIndex++;
+            setTimeout(type, 50);
+          }
+        }
+
+        textElement.textContent = "";
+        type();
+      }
+
+      const bgMusic = document.getElementById("bg-music");
+      const musicBtn = document.getElementById("music-btn");
+
+      musicBtn.addEventListener("click", () => {
+        if (bgMusic.paused) {
+          bgMusic.play();
+          musicBtn.textContent = "🔇 Stop Music";
+        } else {
+          bgMusic.pause();
+          musicBtn.textContent = "🎵 Play Music";
+        }
+      });
+    </script>
+  </body>
+</html>
